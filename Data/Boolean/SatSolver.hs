@@ -8,7 +8,7 @@
 -- Portability : portable
 -- 
 -- This Haskell library provides an implementation of the
--- Davis-Putnam-Logemann-Loveland (DPLL) algorithm
+-- Davis-Putnam-Logemann-Loveland algorithm
 -- (cf. <http://en.wikipedia.org/wiki/DPLL_algorithm>) for the boolean
 -- satisfiability problem. It not only allows to solve boolean
 -- formulas in one go but also to add constraints and query bindings
@@ -52,7 +52,7 @@ isSolved = null . clauses
 -- |
 -- We can lookup the binding of a variable according to the currently
 -- stored constraints. If the variable is unbound, the result is
--- @Nothing@. We use @Int@s as variable names.
+-- @Nothing@.
 -- 
 lookupVar :: Int -> SatSolver -> Maybe Bool
 lookupVar name = IM.lookup name . bindings
@@ -108,17 +108,17 @@ simplify solver = do
 
 simplifyClauses :: MonadPlus m => CNF -> WriterT [(Int,Bool)] m CNF
 simplifyClauses [] = return []
-simplifyClauses clauses = do
-  let shortestClause = head . sortBy shorter $ clauses
+simplifyClauses allClauses = do
+  let shortestClause = head . sortBy shorter $ allClauses
   guard (not (null shortestClause))
   if null (tail shortestClause)
-   then propagate (head shortestClause) clauses >>= simplifyClauses
-   else return clauses
+   then propagate (head shortestClause) allClauses >>= simplifyClauses
+   else return allClauses
 
 propagate :: MonadPlus m => Literal -> CNF -> WriterT [(Int,Bool)] m CNF
-propagate literal clauses = do
+propagate literal allClauses = do
   tell [(literalVar literal, isPositiveLiteral literal)]
-  return (foldr prop [] clauses)
+  return (foldr prop [] allClauses)
  where
   prop c cs | literal `elem` c = cs
             | otherwise        = filter (invLiteral literal/=) c : cs

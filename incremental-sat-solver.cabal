@@ -3,9 +3,10 @@ Version:       0.1
 Cabal-Version: >= 1.6
 Synopsis:      Simple, Incremental SAT Solving as a Library
 Description:   This Haskell library provides an implementation of the
-               Davis-Putnam-Logemann-Loveland (DPLL) algorithm for the
-               boolean satisfiability problem. It not only allows to
-               solve boolean formulas in one go but also to add
+               Davis-Putnam-Logemann-Loveland algorithm
+               (cf. <http://en.wikipedia.org/wiki/DPLL_algorithm>) for
+               the boolean satisfiability problem. It not only allows
+               to solve boolean formulas in one go but also to add
                constraints and query bindings of variables
                incrementally.
 Category:      Algorithms
@@ -21,7 +22,7 @@ Stability:     experimental
 Extra-Source-Files: README
 
 Library
-  Build-Depends:    base
+  Build-Depends:    base, containers, mtl
   Exposed-Modules:  Data.Boolean.SatSolver
   Other-Modules:    Data.Boolean
   Ghc-Options:      -Wall
