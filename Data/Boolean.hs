@@ -75,8 +75,8 @@ type Clause  = [Literal]
 -- 
 booleanToCNF :: Boolean -> CNF
 booleanToCNF
-  = map (map literal . flatDisjunction)
-  . flatConjunction
+  = map (map literal . disjunction)
+  . conjunction
   . asLongAsPossible distribute
   . asLongAsPossible pushNots
   . asLongAsPossible elim
@@ -108,14 +108,16 @@ booleanToCNF
 
 -- private helper functions
 
-flatConjunction :: Boolean -> [Boolean]
-flatConjunction b = flat b []
- where flat (x:&&:y) = flat x . flat y
+conjunction :: Boolean -> [Boolean]
+conjunction b = flat b []
+ where flat Yes      = id
+       flat (x:&&:y) = flat x . flat y
        flat x        = (x:)
 
-flatDisjunction :: Boolean -> [Boolean]
-flatDisjunction b = flat b []
- where flat (x:||:y) = flat x . flat y
+disjunction :: Boolean -> [Boolean]
+disjunction b = flat b []
+ where flat No       = id
+       flat (x:||:y) = flat x . flat y
        flat x        = (x:)
 
 asLongAsPossible :: (Boolean -> Maybe Boolean) -> Boolean -> Boolean

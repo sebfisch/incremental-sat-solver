@@ -23,7 +23,7 @@ module Data.Boolean.SatSolver (
 
   newSatSolver, isSolved, 
 
-  lookupVar, assertTrue, branchOnVar, satisfy, selectBranchVar
+  lookupVar, assertTrue, branchOnVar, selectBranchVar, solve
 
   ) where
 
@@ -76,22 +76,22 @@ branchOnVar name solver =
         (const (return solver))
         (lookupVar name solver)
 
--- | 
--- This function guesses values for variables such that the stored
--- constraints are satisfied. The result may be non-deterministic and
--- is, hence, returned in an instance of @MonadPlus@.
--- 
-satisfy :: MonadPlus m => SatSolver -> m SatSolver
-satisfy solver
-  | isSolved solver = return solver
-  | otherwise = branchOnUnbound (selectBranchVar solver) solver >>= satisfy
-
 -- |
 -- We select a variable from the shortest clause hoping to produce a
 -- unit clause.
 --
 selectBranchVar :: SatSolver -> Int
 selectBranchVar = literalVar . head . head . sortBy shorter . clauses
+
+-- | 
+-- This function guesses values for variables such that the stored
+-- constraints are satisfied. The result may be non-deterministic and
+-- is, hence, returned in an instance of @MonadPlus@.
+-- 
+solve :: MonadPlus m => SatSolver -> m SatSolver
+solve solver
+  | isSolved solver = return solver
+  | otherwise = branchOnUnbound (selectBranchVar solver) solver >>= solve
 
 
 -- private helper functions
