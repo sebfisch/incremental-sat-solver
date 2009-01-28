@@ -18,7 +18,7 @@ module Data.Boolean (
 
   Boolean(..), 
 
-  Literal, literalVar, invLiteral, isPositiveLiteral, 
+  Literal(..), literalVar, invLiteral, isPositiveLiteral, 
 
   CNF, booleanToCNF
 
