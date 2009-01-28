@@ -22,7 +22,8 @@ Extra-Source-Files: README
 
 Library
   Build-Depends:    base
-  Exposed-Modules:  
+  Exposed-Modules:  Data.Boolean.SatSolver
+  Other-Modules:    Data.Boolean
   Ghc-Options:      -Wall
 
 Source-Repository head
