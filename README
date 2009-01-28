@@ -1,0 +1,12 @@
+Simple, Incremental SAT Solving as a Library
+============================================
+
+This Haskell library provides an implementation of the
+Davis-Putnam-Logemann-Loveland (DPLL) algorithm for the boolean
+satisfiability problem. It not only allows to solve boolean formulas
+in one go but also to add constraints and query bindings of variables
+incrementally.
+
+The implementation is not sophisticated at all but uses the basic DPLL
+algorithm with unit propagation.
+
