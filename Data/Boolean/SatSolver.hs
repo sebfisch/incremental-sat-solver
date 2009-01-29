@@ -96,15 +96,23 @@ solve solver
 
 -- private helper functions
 
-updateSolver :: CNF -> [(Int,Bool)] -> SatSolver -> SatSolver
-updateSolver cs bs solver =
-  solver { clauses  = cs,
-           bindings = foldr (uncurry IM.insert) (bindings solver) bs }
+updateSolver :: MonadPlus m => CNF -> [(Int,Bool)] -> SatSolver -> m SatSolver
+updateSolver cs bs solver = do
+  bs' <- foldr (uncurry insertBinding) (return (bindings solver)) bs
+  return $ solver { clauses = cs, bindings = bs' }
+
+insertBinding :: MonadPlus m
+              => Int -> Bool -> m (IM.IntMap Bool) -> m (IM.IntMap Bool)
+insertBinding name newValue binds = do
+  bs <- binds
+  maybe (return (IM.insert name newValue bs))
+        (\oldValue -> do guard (oldValue==newValue); return bs)
+        (IM.lookup name bs)
 
 simplify :: MonadPlus m => SatSolver -> m SatSolver
 simplify solver = do
   (cs,bs) <- runWriterT . simplifyClauses . clauses $ solver
-  return $ updateSolver cs bs solver
+  updateSolver cs bs solver
 
 simplifyClauses :: MonadPlus m => CNF -> WriterT [(Int,Bool)] m CNF
 simplifyClauses [] = return []
@@ -130,7 +138,7 @@ branchOnUnbound name solver =
 guess :: MonadPlus m => Literal -> SatSolver -> m SatSolver
 guess literal solver = do
   (cs,bs) <- runWriterT (propagate literal (clauses solver) >>= simplifyClauses)
-  return $ updateSolver cs bs solver
+  updateSolver cs bs solver
 
 shorter :: [a] -> [a] -> Ordering
 shorter []     []     = EQ
