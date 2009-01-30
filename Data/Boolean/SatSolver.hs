@@ -23,7 +23,7 @@ module Data.Boolean.SatSolver (
 
   newSatSolver, isSolved, 
 
-  lookupVar, assertTrue, branchOnVar, selectBranchVar, solve
+  lookupVar, assertTrue, branchOnVar, selectBranchVar, solve, isSolvable
 
   ) where
 
@@ -92,6 +92,15 @@ solve :: MonadPlus m => SatSolver -> m SatSolver
 solve solver
   | isSolved solver = return solver
   | otherwise = branchOnUnbound (selectBranchVar solver) solver >>= solve
+
+-- |
+-- This predicate tells whether the stored constraints are
+-- solvable. Use with care! This might be an inefficient operation. It
+-- tries to find a solution using backtracking and returns @True@ if
+-- and only if that fails.
+-- 
+isSolvable :: SatSolver -> Bool
+isSolvable = not . null . solve
 
 
 -- private helper functions
