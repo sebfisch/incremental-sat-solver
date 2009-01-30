@@ -25,6 +25,8 @@ module Data.Boolean (
 
   ) where
 
+import Data.List ( nub )
+
 -- | Boolean formulas are represented as values of type @Boolean@.
 -- 
 data Boolean
@@ -76,7 +78,7 @@ type Clause  = [Literal]
 -- 
 booleanToCNF :: Boolean -> CNF
 booleanToCNF
-  = map (map literal . disjunction)
+  = map (nub . map literal . disjunction)
   . conjunction
   . asLongAsPossible distribute
   . asLongAsPossible pushNots
