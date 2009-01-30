@@ -40,6 +40,7 @@ data Boolean
   | Boolean :&&: Boolean
   -- | and disjunction of boolean formulas.
   | Boolean :||: Boolean
+ deriving Show
 
 -- | Literals are variables that occur either positively or negatively.
 -- 
