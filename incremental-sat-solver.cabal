@@ -1,5 +1,5 @@
 Name:          incremental-sat-solver
-Version:       0.1.3
+Version:       0.1.4
 Cabal-Version: >= 1.6
 Synopsis:      Simple, Incremental SAT Solving as a Library
 Description:   This Haskell library provides an implementation of the
