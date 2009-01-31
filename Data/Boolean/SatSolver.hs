@@ -62,8 +62,11 @@ lookupVar name = IM.lookup name . bindings
 -- assertion may fail if the resulting constraints are unsatisfiable.
 -- 
 assertTrue :: MonadPlus m => Boolean -> SatSolver -> m SatSolver
-assertTrue formula solver =
-  simplify (solver { clauses = booleanToCNF formula ++ clauses solver })
+assertTrue formula solver = do
+  newClauses <- foldl (addClause (bindings solver))
+                      (return (clauses solver))
+                      (booleanToCNF formula)
+  simplify (solver { clauses = newClauses })
 
 -- |
 -- This function guesses a value for the given variable, if it is
@@ -104,6 +107,21 @@ isSolvable = not . null . solve
 
 
 -- private helper functions
+
+addClause :: MonadPlus m => IM.IntMap Bool -> m [Clause] -> Clause -> m [Clause]
+addClause binds mclauses newClause = do
+  oldClauses <- mclauses
+  let unboundLits = foldl (addUnbound binds) (Just []) newClause
+  maybe (return oldClauses)
+        (\lits -> guard (not (null lits)) >> return (lits:oldClauses))
+        unboundLits
+
+addUnbound :: IM.IntMap Bool -> Maybe Clause -> Literal -> Maybe Clause
+addUnbound binds mlits lit = do
+  lits <- mlits
+  maybe (Just (lit:lits))
+        (\b -> guard (b /= isPositiveLiteral lit) >> return lits)
+        (IM.lookup (literalVar lit) binds)
 
 updateSolver :: MonadPlus m => CNF -> [(Int,Bool)] -> SatSolver -> m SatSolver
 updateSolver cs bs solver = do

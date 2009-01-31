@@ -21,7 +21,7 @@ module Data.Boolean (
 
   Literal(..), literalVar, invLiteral, isPositiveLiteral, 
 
-  CNF, booleanToCNF
+  CNF, Clause, booleanToCNF
 
   ) where
 
