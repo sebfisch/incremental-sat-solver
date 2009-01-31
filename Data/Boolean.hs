@@ -25,7 +25,10 @@ module Data.Boolean (
 
   ) where
 
-import Data.List ( nub )
+import Data.Maybe ( mapMaybe )
+import qualified Data.IntMap as IM
+
+import Control.Monad ( guard, liftM )
 
 -- | Boolean formulas are represented as values of type @Boolean@.
 -- 
@@ -78,7 +81,7 @@ type Clause  = [Literal]
 -- 
 booleanToCNF :: Boolean -> CNF
 booleanToCNF
-  = map (nub . map literal . disjunction)
+  = mapMaybe (simpleClause . map literal . disjunction)
   . conjunction
   . asLongAsPossible distribute
   . asLongAsPossible pushNots
@@ -110,6 +113,22 @@ booleanToCNF
 
 
 -- private helper functions
+
+-- remove duplicate literals from clauses and drop clauses that
+-- contain one literal both positively and negatively.
+--
+simpleClause :: Clause -> Maybe Clause
+simpleClause = liftM (map lit . IM.toList) . foldl add (Just IM.empty)
+ where
+  lit (x,True)  = Pos x
+  lit (x,False) = Neg x
+
+  add mm l = do
+    m <- mm
+    let x = literalVar l; kind = isPositiveLiteral l
+    maybe (Just (IM.insert x kind m))
+          (\b -> guard (b==kind) >> Just m)
+          (IM.lookup x m)
 
 conjunction :: Boolean -> [Boolean]
 conjunction b = flat b []
