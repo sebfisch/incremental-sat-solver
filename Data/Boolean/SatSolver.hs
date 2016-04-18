@@ -103,7 +103,7 @@ solve solver
 -- and only if that fails.
 -- 
 isSolvable :: SatSolver -> Bool
-isSolvable = not . null . solve
+isSolvable solver = case solve solver of [] -> False; _ -> True
 
 
 -- private helper functions
