@@ -2,3 +2,5 @@
 *.hi
 *.o
 dist/*
+stack.yaml
+.stack-work/*
