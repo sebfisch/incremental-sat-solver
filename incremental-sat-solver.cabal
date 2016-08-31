@@ -22,7 +22,7 @@ Stability:     experimental
 Extra-Source-Files: README
 
 Library
-  Build-Depends:    base, containers, mtl
+  Build-Depends:    base < 5, containers, mtl
   Exposed-Modules:  Data.Boolean.SatSolver
   Other-Modules:    Data.Boolean
   Ghc-Options:      -Wall
